@@ -26,8 +26,10 @@ import edu.nyu.cs.javagit.api.commands.GitLogResponse.CommitFile;
 
 
 public class GitExtractor {
-	static String REPO_PATH = "git-repos/";
-	//static String REPO_PATH = "D:/junit/junit/";
+	static String REPO_PATH = "git-repos/";	
+//	static String REPO_PATH = "D:/junit/junit/";
+	
+	private static boolean REVERSE_ORDER_ENABLED = true; 
 	
 	public static ScmFile incrementComponentCount(HashMap<ScmFile, Integer>components, String path) {
     	ScmFile scmFile = new ScmFile(path);
@@ -118,6 +120,10 @@ public class GitExtractor {
 		GitLogOptions options = new GitLogOptions();
 		options.setOptFileDetails(true);
 		
+		if (REVERSE_ORDER_ENABLED) {
+			// Order from oldest to latest
+			options.setOptOrderingReverse(true);
+		}
 		
 		////////////////////////////////////
 		File repoPathDot = new File(REPO_PATH + "/.");

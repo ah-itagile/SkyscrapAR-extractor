@@ -92,9 +92,15 @@ public class SCMtoXML {
 			newVersion.setAttribute("num", version+"");
 			newVersion.setAttribute("curr_loc", loc+"");
 			newVersion.setAttribute("changed", "1");
-			long churn = calculateCodeChurn(existingClass, version, loc);
-			newVersion.setAttribute("churn", churn+"");
-			existingClass.addContent(newVersion);
+			try {
+				long churn = calculateCodeChurn(existingClass, version, loc);
+				newVersion.setAttribute("churn", churn+"");
+				existingClass.addContent(newVersion);
+			}
+			catch(Exception e) {
+				// Same version already added. Ignore this version.
+				System.out.println(e.getMessage());
+			}
 			//Now, update class max loc
 			long maxLoc = getClassMaxLoc(existingClass);
 			if ( loc > maxLoc )
@@ -137,15 +143,11 @@ public class SCMtoXML {
 					long locLastVersion = Integer.valueOf(lastVersion.getAttributeValue("curr_loc")).intValue();
 					if(locLastVersion != loc) //more code churn happened. So... update churn value
 					{
-						if(locLastVersion > loc) 
-							churn += (locLastVersion - loc);
-						else
-							churn += (loc - locLastVersion);
-						
+						churn += Math.abs(locLastVersion - loc);
 					}
 				} 
 				return churn; 
-			}else throw new Exception("Error! Trying to add a new version lower than (or equals than) the last one.");
+			} else throw new Exception("Error! Trying to add a new version lower than (or equals than) the last one.");
 		}
 		return loc; //at the first time a class changed, the code churn is assumed to be the loc value committed
 	}
